@@ -1,0 +1,11 @@
+@startuml
+actor Operador
+component CLI
+component "Servico de eventos" as Servico
+component "Broker Kafka" as Broker
+component Consumidor
+Operador --> CLI
+CLI --> Servico
+Servico --> Broker
+Broker --> Consumidor
+@enduml

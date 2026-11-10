@@ -1,0 +1,1 @@
+"""Mensageria do laboratório Kafka."""
