@@ -29,3 +29,10 @@ python -m unittest discover -s tests -v
 ```
 
 Os testes unitários validam eventos e o contrato do publicador, **não** uma conexão real com Kafka. O serviço em produção exigiria autenticação, TLS, idempotência e controle de retenção.
+
+## Documentação técnica v1.0.0
+
+- [Especificação de projeto](docs/projeto/ESPECIFICACAO.md)
+- [Diagramas UML específicos](docs/uml/README.md)
+- [Plano de testes](docs/testes/PLANO_DE_TESTES.md)
+- [Controle de versões](docs/controle/VERSIONAMENTO.md)

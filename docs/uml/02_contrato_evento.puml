@@ -1,0 +1,22 @@
+@startuml
+class Evento <<frozen dataclass>> {
+ +id: str (UUID4)
+ +topico: str
+ +tipo: str
+ +dados: dict
+ +criado_em: str (UTC ISO-8601)
+ +serializar(): bytes
+}
+class PublicadorEventos {
+ -produtor
+ +publicar(evento): Future
+}
+class KafkaProducer <<externo>>
+PublicadorEventos --> Evento
+PublicadorEventos --> KafkaProducer
+note bottom of Evento
+topico ∈ {route, freight, simulation}
+tipo não vazio
+dados objeto JSON
+end note
+@enduml

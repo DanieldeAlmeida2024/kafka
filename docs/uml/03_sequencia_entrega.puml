@@ -1,0 +1,23 @@
+@startuml
+actor Operador
+participant "principal.py" as CLI
+participant "Evento" as EV
+participant "PublicadorEventos" as PUB
+participant "KafkaProducer" as K
+queue Broker
+participant "KafkaConsumer" as C
+Operador -> CLI : publicar(...)
+CLI -> EV : criar_evento()
+CLI -> PUB : publicar(evento)
+PUB -> K : send(topico, bytes)
+K -> Broker : append
+PUB -> K : flush(timeout=10)
+CLI -> K : Future.get(timeout=10)
+Broker -> C : entregar registro
+C -> Operador : imprimir UTF-8
+C -> Broker : commit offset
+note right of C
+Falha antes do commit pode
+causar reentrega.
+end note
+@enduml
