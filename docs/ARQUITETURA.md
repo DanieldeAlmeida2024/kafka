@@ -1,12 +1,3 @@
-# Arquitetura
+# Arquitetura de kafka
 
-```mermaid
-flowchart LR
-  Operador --> CLI["principal.py"]
-  CLI --> Eventos["Contrato de eventos"]
-  CLI --> Servico["PublicadorEventos"]
-  Servico --> Kafka["Broker Kafka"]
-  Kafka --> Consumidor["Consumidor por grupo"]
-```
-
-O código distingue modelo de evento, transporte e CLI. Os tópicos são provisionados pelo Compose. O broker está em PLAINTEXT e **não deve ser exposto à internet**.
+Consulte a [especificação específica](projeto/ESPECIFICACAO.md) e os [diagramas de componentes, classes e sequência](uml/README.md) (v1.0.0).

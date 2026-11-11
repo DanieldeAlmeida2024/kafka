@@ -1,0 +1,17 @@
+@startuml
+actor "Operador CLI" as O
+component "principal.py" as CLI
+component "criar_evento()\nmensageria/eventos.py" as E
+component "PublicadorEventos" as P
+component "KafkaProducer" as KP
+component "KafkaConsumer" as KC
+queue "Kafka 7.3\nroute / freight / simulation" as Broker
+O --> CLI
+CLI --> E
+CLI --> P
+P --> KP : send / flush
+KP --> Broker
+Broker --> KC : poll
+KC --> CLI : mensagem
+CLI --> O : JSON
+@enduml
