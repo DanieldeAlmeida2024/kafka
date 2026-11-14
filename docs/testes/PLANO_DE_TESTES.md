@@ -64,3 +64,5 @@ Registre commit, versão de `docker-compose.yaml`, event schema e evidências do
 | KFK-19 | Timeout de confirmação do broker | Não imprime mensagem de sucesso; fecha produtor |
 
 Suite `tests/test_rastreamento.py`, executada pelo workflow `testes.yml` com Python 3.12. Não valida a entrega real, reconexões, reprocessamento e duplicação entre produtores/consumidores. Esses gates dependem de teste integrado com Kafka e MongoDB.
+
+| KFK-20 | Distância acima de `2^53−1` e coordenadas inteiras gigantes | Erro de validação em Python antes da publicação; sem overflow numérico |
