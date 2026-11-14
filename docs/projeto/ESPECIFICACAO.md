@@ -52,3 +52,5 @@ Documentar esquema de versão do evento, serialização de erro/DLQ, chave de pa
 A função `mensageria/rastreamento.py:serializar_evento_rastreamento` valida: IDs sem segmentos de path (1–128 caracteres), distância inteira não negativa, 1–600 posições, coordenadas numéricas finitas nos intervalos geográficos, sem campos extras. Rejeita booleanos usados como números e eventos de nome desconhecido. JSON serializado é UTF-8 e tem teto 262.144 bytes.
 
 A CLI exige confirmação de envio do produtor por `.get(timeout=10)`. Essa confirmação **não** significa que o Go processou ou persistiu a mensagem. O consumidor Go é `at-least-once` e pode falhar quando encontra mensagem de contrato incompatível. Sem DLQ ou deduplicação, evitar publicar envelopes do exemplo Python no mesmo tópico de rota do sistema principal.
+
+O campo `distance` segue também o limite de inteiro seguro do NestJS (`Number.isSafeInteger`, valor máximo `2^53−1`); coordenadas inteiras gigantes são rejeitadas antes da conversão para ponto flutuante, evitando estouro ou divergência entre Python e Go.
