@@ -40,3 +40,15 @@ python principal.py --servidor localhost:9094 consumir --topico route --grupo la
 
 ## Evolução recomendada
 Documentar esquema de versão do evento, serialização de erro/DLQ, chave de partição para preservar ordenação quando necessária e idempotência do lado do consumidor; testar `advertised.listeners` do host antes de diagnosticar falha de publicação.
+
+## MSG-KAFKA 1.2.0 — dois formatos deliberadamente separados
+
+| Interface | Tópico | Contrato | Compatibilidade |
+| --- | --- | --- | --- |
+| CLI `publicar` | route/freight/simulation | Envelope genérico `id,topico,tipo,dados,criado_em` | Laboratório Python; **não** é `RouteCreated` nativo |
+| CLI `publicar-rastreamento` | route | `RouteCreated {event,id,distance,directions[{lat,lng}]}` | Consumidor Go e produtor NestJS |
+| CLI `publicar-rastreamento` | route | `DeliveryStarted {event,route_id}` | Consumidor Go e produtor NestJS |
+
+A função `mensageria/rastreamento.py:serializar_evento_rastreamento` valida: IDs sem segmentos de path (1–128 caracteres), distância inteira não negativa, 1–600 posições, coordenadas numéricas finitas nos intervalos geográficos, sem campos extras. Rejeita booleanos usados como números e eventos de nome desconhecido. JSON serializado é UTF-8 e tem teto 262.144 bytes.
+
+A CLI exige confirmação de envio do produtor por `.get(timeout=10)`. Essa confirmação **não** significa que o Go processou ou persistiu a mensagem. O consumidor Go é `at-least-once` e pode falhar quando encontra mensagem de contrato incompatível. Sem DLQ ou deduplicação, evitar publicar envelopes do exemplo Python no mesmo tópico de rota do sistema principal.
