@@ -10,6 +10,7 @@ import re
 
 MAX_EVENTO_BYTES = 256 * 1024
 MAX_PONTOS = 600
+MAX_DISTANCIA_SEGURA = (1 << 53) - 1  # compatível com Number.isSafeInteger do NestJS
 ID = re.compile(r"^[A-Za-z0-9][A-Za-z0-9_-]{0,127}$")
 
 
@@ -27,8 +28,8 @@ def serializar_evento_rastreamento(evento: str, dados: dict) -> bytes:
         if not _identificador(dados["id"]):
             raise ValueError("RouteCreated exige id válido.")
         distancia = dados["distance"]
-        if type(distancia) is not int or distancia < 0:
-            raise ValueError("distance deve ser inteiro não negativo.")
+        if type(distancia) is not int or not 0 <= distancia <= MAX_DISTANCIA_SEGURA:
+            raise ValueError("distance deve ser inteiro não negativo e seguro no NestJS.")
         pontos = dados["directions"]
         if not isinstance(pontos, list) or not 1 <= len(pontos) <= MAX_PONTOS:
             raise ValueError("directions deve ter entre 1 e 600 pontos.")
@@ -37,7 +38,7 @@ def serializar_evento_rastreamento(evento: str, dados: dict) -> bytes:
                 raise ValueError(f"Ponto {indice}: exige lat e lng.")
             for chave, limite in (("lat", 90), ("lng", 180)):
                 numero = ponto[chave]
-                if type(numero) not in (int, float) or not math.isfinite(numero) or abs(numero) > limite:
+                if type(numero) not in (int, float) or abs(numero) > limite or not math.isfinite(numero):
                     raise ValueError(f"Ponto {indice}: {chave} inválido.")
     elif evento == "DeliveryStarted":
         if set(dados) != {"route_id"} or not _identificador(dados["route_id"]):
