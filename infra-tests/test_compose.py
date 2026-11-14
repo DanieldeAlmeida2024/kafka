@@ -21,14 +21,14 @@ class KafkaComposeTest(unittest.TestCase):
         ports = self.services["kafka"].get("ports", [])
         self.assertEqual(1, len(ports))
         self.assertEqual("127.0.0.1", ports[0]["host_ip"])
-        self.assertEqual(9094, ports[0]["published"])
+        self.assertEqual(9094, int(ports[0]["published"]))
         self.assertEqual(9094, ports[0]["target"])
 
     def test_console_sem_porta_publica(self):
         ports = self.services["control-center"].get("ports", [])
         self.assertEqual(1, len(ports))
         self.assertEqual("127.0.0.1", ports[0]["host_ip"])
-        self.assertEqual(9021, ports[0]["published"])
+        self.assertEqual(9021, int(ports[0]["published"]))
 
     def test_listeners_interno_e_externo(self):
         env = self.services["kafka"]["environment"]
