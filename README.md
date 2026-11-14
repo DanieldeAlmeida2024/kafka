@@ -36,3 +36,7 @@ Os testes unitários validam eventos e o contrato do publicador, **não** uma co
 - [Diagramas UML específicos](docs/uml/README.md)
 - [Plano de testes](docs/testes/PLANO_DE_TESTES.md)
 - [Controle de versões](docs/controle/VERSIONAMENTO.md)
+
+## Integridade dos eventos (13/11/2026)
+
+A criação do evento valida a representação JSON antes de contatar o broker: recusa números não finitos, objetos não serializáveis e mensagens maiores que **256 KiB**. A codificação permanece UTF-8 e os tópicos ficam restritos a `route`, `freight` e `simulation`. O workflow `.github/workflows/testes.yml` testa esse contrato; **não executa integração real com Kafka**, tolerância a falhas nem TLS.
