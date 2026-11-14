@@ -27,3 +27,12 @@ Versão **MAJOR** quando o contrato mudar; **MINOR** para casos/fluxos novos; **
 - CLI `publicar-rastreamento` aguarda confirmação do broker e retorna falhas sem anunciar sucesso.
 - Suíte de testes de contrato/CLI e documentação específica do uso conjunto.
 - **Pendente:** broker real, deduplicação, tratamento de poison messages, DLQ, TLS/SASL e homologação E2E.
+
+## MSG-KAFKA 2.0.0 — separar envelope genérico dos tópicos nativos (14/11/2026)
+
+- Mudança de contrato intencional: `criar_evento` e CLI `publicar` **não** enviam mais envelopes genéricos a `route`, `freight` ou `simulation`, evitando parar consumidor Go por poison message.
+- Novo tópico `laboratorio` gerado por Docker Compose recebe somente mensagens didáticas; CLI `consumir` continua capaz de inspecionar todos os quatro tópicos.
+- O publicador `publicar-rastreamento` continua enviando JSON nativo de `RouteCreated` e `DeliveryStarted` a `route` sem modificação de wire format.
+- Testes unitários provam recusa de mistura antes de conectar e a configuração do Compose valida presença do tópico. **Não** substitui DLQ/retries nem E2E com broker.
+
+Compatibilidade: scripts antigos que usavam `publicar --topico route` devem mudar para `publicar-rastreamento` ou usar `laboratorio` em exercícios isolados. Nenhum broker remoto foi alterado.

@@ -4,7 +4,9 @@ from datetime import datetime, timezone
 from uuid import uuid4
 import json
 
-TOPICOS_PERMITIDOS = frozenset({'route', 'freight', 'simulation'})
+# Envelope genérico de aprendizagem nunca deve contaminar contratos nativos.
+TOPICOS_PERMITIDOS = frozenset({'laboratorio'})
+TOPICOS_NATIVOS = frozenset({'route', 'freight', 'simulation'})
 MAX_EVENTO_BYTES = 256 * 1024
 
 @dataclass(frozen=True)

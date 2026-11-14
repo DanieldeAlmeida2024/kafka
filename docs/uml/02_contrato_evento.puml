@@ -15,7 +15,8 @@ class KafkaProducer <<externo>>
 PublicadorEventos --> Evento
 PublicadorEventos --> KafkaProducer
 note bottom of Evento
-topico ∈ {route, freight, simulation}
+topico genérico ∈ {laboratorio}
+route/freight/simulation têm contratos nativos independentes
 tipo não vazio
 dados objeto JSON
 end note
