@@ -31,7 +31,7 @@ class TestesRastreamentoNativo(unittest.TestCase):
         self.assertEqual(json.loads(raw), {"event": "DeliveryStarted", "route_id": "r-1"})
 
     def test_route_created_valida_distancia_e_id(self):
-        for valor in (-1, True, False, 1.5, "4000", None):
+        for valor in (-1, True, False, 1.5, "4000", None, (1 << 53), 10 ** 1000):
             with self.subTest(valor=valor), self.assertRaises(ValueError):
                 serializar_evento_rastreamento("RouteCreated", {**self.rota, "distance": valor})
         for valor in ("", "../../other", "x" * 129, 42, None):
@@ -53,6 +53,7 @@ class TestesRastreamentoNativo(unittest.TestCase):
             {"lat": True, "lng": 0}, {"lat": math.nan, "lng": 0},
             {"lat": 90.1, "lng": 0}, {"lat": 0, "lng": -180.1},
             {"lat": 0, "lng": math.inf}, {"lat": "10", "lng": 0},
+            {"lat": 10 ** 1000, "lng": 0},
             {"lat": 0}, [0, 0],
         ):
             with self.subTest(point=str(point)), self.assertRaises(ValueError):
