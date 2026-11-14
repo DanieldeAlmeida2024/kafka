@@ -18,3 +18,12 @@ Versão inicial: **1.0.0**, em 11/11/2026. Código auditado: `754092c70eeb10efb2
 
 ### Regras
 Versão **MAJOR** quando o contrato mudar; **MINOR** para casos/fluxos novos; **PATCH** para correções editoriais. Cada PR que alterar comportamento deve atualizar os documentos afetados e registrar o SHA testado e evidências, nunca substituir execução por proposta.
+
+## MSG-KAFKA 1.2.0 — publicador nativo de rastreamento (14/11/2026)
+
+- Preservado o envelope Python genérico para aprendizado isolado.
+- Adicionado publicador nativo `RouteCreated`/`DeliveryStarted` alinhado ao contrato do Go Simulator.
+- Validada estrutura e limites compartilhados (600 coordenadas, 256 KiB), sem alterações de tópicos ou volumes.
+- CLI `publicar-rastreamento` aguarda confirmação do broker e retorna falhas sem anunciar sucesso.
+- Suíte de testes de contrato/CLI e documentação específica do uso conjunto.
+- **Pendente:** broker real, deduplicação, tratamento de poison messages, DLQ, TLS/SASL e homologação E2E.
