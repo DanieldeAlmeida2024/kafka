@@ -1,7 +1,7 @@
 """CLI: publicar/consumir eventos em um Kafka local."""
 import argparse
 import json
-from mensageria.eventos import TOPICOS_PERMITIDOS, criar_evento
+from mensageria.eventos import TOPICOS_PERMITIDOS, TOPICOS_NATIVOS, criar_evento
 from mensageria.rastreamento import serializar_evento_rastreamento
 from mensageria.servico import PublicadorEventos, criar_produtor, criar_consumidor
 
@@ -17,7 +17,7 @@ def main():
     rast.add_argument('--evento', choices=('RouteCreated', 'DeliveryStarted'), required=True)
     rast.add_argument('--dados', required=True, help='JSON com id/distance/directions ou route_id')
     cons = sub.add_parser('consumir')
-    cons.add_argument('--topico', choices=sorted(TOPICOS_PERMITIDOS), required=True)
+    cons.add_argument('--topico', choices=sorted(TOPICOS_PERMITIDOS | TOPICOS_NATIVOS), required=True)
     cons.add_argument('--grupo', default='laboratorio-python')
     args = parser.parse_args()
     if args.comando == 'publicar':

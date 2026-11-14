@@ -1,6 +1,6 @@
 # Kafka — laboratório de mensageria de rotas, fretes e simulações
 
-Infraestrutura de desenvolvimento com Kafka/ZooKeeper e **exemplo funcional em Python 3.10+**. O código Python publica e consome eventos dos tópicos `route`, `freight` e `simulation`.
+Infraestrutura de desenvolvimento com Kafka/ZooKeeper e **exemplo funcional em Python 3.10+**. A CLI separa eventos didáticos no tópico **`laboratorio`** e mensagens nativas de rastreamento no tópico **`route`**; monitora também `freight` e `simulation`.
 
 ## Requisitos
 Docker Compose, Python 3.10+ e acesso ao broker.
@@ -8,8 +8,8 @@ Docker Compose, Python 3.10+ e acesso ao broker.
 ```bash
 docker compose up -d
 python -m pip install -r requirements.txt
-python principal.py --servidor localhost:9094 publicar --topico route --tipo ROTA_CRIADA --dados '{"codigo":"R001"}'
-python principal.py --servidor localhost:9094 consumir --topico route --grupo teste-local
+python principal.py --servidor localhost:9094 publicar --topico laboratorio --tipo ROTA_CRIADA --dados '{"codigo":"R001"}'
+python principal.py --servidor localhost:9094 consumir --topico laboratorio --grupo teste-local
 ```
 
 O endereço externo é **`localhost:9094`** no Windows, Linux e macOS. O listener interno é `kafka:9092` somente entre contêineres. O painel Control Center é `http://localhost:9021` e ambos os acessos externos ficam limitados a `127.0.0.1` do host. É um ambiente **PLAINTEXT somente para laboratório**; não publicar em redes públicas.
@@ -47,7 +47,7 @@ Os testes unitários validam eventos e o contrato do publicador, **não** uma co
 
 ## Contrato e integridade dos eventos
 
-A criação do evento valida a representação JSON antes de contatar o broker: recusa números não finitos, objetos não serializáveis e mensagens maiores que **256 KiB**. A codificação permanece UTF-8 e os tópicos ficam restritos a `route`, `freight` e `simulation`. O workflow `.github/workflows/testes.yml` testa esse contrato; **não executa integração real com Kafka**, tolerância a falhas nem TLS.
+A criação do evento valida a representação JSON antes de contatar o broker: recusa números não finitos, objetos não serializáveis e mensagens maiores que **256 KiB**. A codificação permanece UTF-8 e o envelope genérico fica restrito ao tópico `laboratorio` (os tópicos `route`, `freight` e `simulation` são reservados aos contratos nativos). O workflow `.github/workflows/testes.yml` testa esse contrato; **não executa integração real com Kafka**, tolerância a falhas nem TLS.
 
 ## Compatibilidade com o Go Simulator — eventos nativos
 
@@ -62,4 +62,4 @@ python principal.py --servidor localhost:9094 publicar-rastreamento --evento Del
 
 O comando publica somente no tópico `route`, preservando os campos e a ordem esperados pelo Go. Valida IDs, distância, latitude/longitude, até **600 pontos** e orçamento de até **256 KiB**. Não conecta ao broker quando os dados são inválidos e só relata envio após receber confirmação do produtor Kafka.
 
-A CLI antiga continua disponível para estudo **separado**. Misturar envelopes genéricos no tópico `route` quando o Go Simulator está consumindo pode interromper o consumidor por evento desconhecido. O ambiente é didático, sem TLS/SASL e sem garantia de E2E.
+A CLI genérica agora usa apenas `laboratorio`: tentar publicar em `route`, `freight` ou `simulation` com envelope didático é recusado **antes de abrir conexão Kafka**. Para `route` use `publicar-rastreamento`; o consumidor genérico permanece capaz de observar os quatro tópicos. Isso evita introduzir por engano mensagens incompatíveis no fluxo Go. O ambiente é didático, sem TLS/SASL e sem garantia de E2E.
