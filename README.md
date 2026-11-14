@@ -48,3 +48,18 @@ Os testes unitários validam eventos e o contrato do publicador, **não** uma co
 ## Contrato e integridade dos eventos
 
 A criação do evento valida a representação JSON antes de contatar o broker: recusa números não finitos, objetos não serializáveis e mensagens maiores que **256 KiB**. A codificação permanece UTF-8 e os tópicos ficam restritos a `route`, `freight` e `simulation`. O workflow `.github/workflows/testes.yml` testa esse contrato; **não executa integração real com Kafka**, tolerância a falhas nem TLS.
+
+## Compatibilidade com o Go Simulator — eventos nativos
+
+O comando `publicar` original envia um **envelope didático genérico** (`id,topico,tipo,dados,criado_em`). Esse envelope **não é aceito diretamente** pelo consumidor de rastreamento Go, que lê `event` e os demais campos no nível principal.
+
+Para publicar mensagens compatíveis com o fluxo NestJS → Kafka → Go, use o novo comando separado:
+
+```bash
+python principal.py --servidor localhost:9094 publicar-rastreamento --evento RouteCreated --dados '{"id":"507f1f77bcf86cd799439011","distance":4000,"directions":[{"lat":-16.6869,"lng":-49.2648},{"lat":-16.7,"lng":-49.3}]}'
+python principal.py --servidor localhost:9094 publicar-rastreamento --evento DeliveryStarted --dados '{"route_id":"507f1f77bcf86cd799439011"}'
+```
+
+O comando publica somente no tópico `route`, preservando os campos e a ordem esperados pelo Go. Valida IDs, distância, latitude/longitude, até **600 pontos** e orçamento de até **256 KiB**. Não conecta ao broker quando os dados são inválidos e só relata envio após receber confirmação do produtor Kafka.
+
+A CLI antiga continua disponível para estudo **separado**. Misturar envelopes genéricos no tópico `route` quando o Go Simulator está consumindo pode interromper o consumidor por evento desconhecido. O ambiente é didático, sem TLS/SASL e sem garantia de E2E.

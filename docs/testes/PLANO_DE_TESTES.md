@@ -48,3 +48,21 @@ docker compose logs kafka --tail=80
 
 ## Portão de qualidade
 Registre commit, versão de `docker-compose.yaml`, event schema e evidências do consumo. Apenas os quatro testes da suíte existente não certificam entrega ao consumidor ou operação confiável em produção.
+
+## MSG-KAFKA 1.2.0 — testes de integração de contrato sem broker
+
+| ID | Caso de teste | Critério |
+| --- | --- | --- |
+| KFK-11 | RouteCreated nativo | Chaves `event,id,distance,directions` no nível principal |
+| KFK-12 | DeliveryStarted nativo | Chaves `event,route_id` |
+| KFK-13 | Distância inválida/booleano e IDs malformados | `ValueError` antes de criar o produtor |
+| KFK-14 | 600 pontos válidos e 601 inválidos | Aceita limite e recusa excesso |
+| KFK-15 | Coordenadas NaN, infinito, fora da faixa ou ausentes | `ValueError` |
+| KFK-16 | Eventos/campos desconhecidos | `ValueError` |
+| KFK-17 | CLI envia para `route` e espera `.get(timeout=10)` | Produtor mockado sem broker |
+| KFK-18 | CLI recebe dados inválidos | `argparse` falha, sem conexão Kafka |
+| KFK-19 | Timeout de confirmação do broker | Não imprime mensagem de sucesso; fecha produtor |
+
+Suite `tests/test_rastreamento.py`, executada pelo workflow `testes.yml` com Python 3.12. Não valida a entrega real, reconexões, reprocessamento e duplicação entre produtores/consumidores. Esses gates dependem de teste integrado com Kafka e MongoDB.
+
+| KFK-20 | Distância acima de `2^53−1` e coordenadas inteiras gigantes | Erro de validação em Python antes da publicação; sem overflow numérico |
