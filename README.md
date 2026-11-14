@@ -12,7 +12,7 @@ python principal.py --servidor localhost:9094 publicar --topico route --tipo ROT
 python principal.py --servidor localhost:9094 consumir --topico route --grupo teste-local
 ```
 
-O endereço externo depende de `KAFKA_ADVERTISED_LISTENERS` no Compose. Ajuste `host.docker.internal` conforme o sistema operacional. É um ambiente **PLAINTEXT somente para laboratório**.
+O endereço externo é **`localhost:9094`** no Windows, Linux e macOS. O listener interno é `kafka:9092` somente entre contêineres. O painel Control Center é `http://localhost:9021` e agora ambos os acessos externos ficam limitados a `127.0.0.1` do host. É um ambiente **PLAINTEXT somente para laboratório**; não publicar em redes públicas.
 
 ## Estrutura
 - `docker-compose.yaml`: Kafka, ZooKeeper e tópicos.
@@ -22,6 +22,14 @@ O endereço externo depende de `KAFKA_ADVERTISED_LISTENERS` no Compose. Ajuste `
 - `tests/test_eventos.py`: testes unitários com produtor simulado.
 - `docs/`: requisitos, arquitetura, UML e plano de testes.
 - `AGENTS.md`: contexto para ferramentas de IA.
+
+## Validar infraestrutura (sem iniciar contêineres)
+```bash
+docker compose -f docker-compose.yaml config --quiet
+python -m unittest discover -s infra-tests -p 'test_compose.py' -v
+```
+
+A validação CI também verifica os binds locais, o par de listeners anunciado e os tópicos da configuração. Ela não sobe Kafka e **não é um teste E2E de mensageria**.
 
 ## Testar
 ```bash

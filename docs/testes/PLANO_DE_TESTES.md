@@ -16,9 +16,23 @@
 | KFK-05 | Falha de `.send()` no broker | Pendente | Retorno/erro previsível sem marcar como entregue |
 | KFK-06 | Consumo seguido de commit de offset | Pendente | Commit apenas depois de processar |
 | KFK-07 | Interrupção antes do commit | Pendente | Evento pode reaparecer; receptor idempotente |
-| KFK-08 | `host.docker.internal:9094` inacessível | Pendente | Diagnóstico de listener/DNS |
+| KFK-08 | Configuração OUTSIDE localhost:9094 e bind de loopback | Sim: `infra-tests/test_compose.py` | Configuração declarativa validada; conexão real ainda pendente |
 | KFK-09 | Evento UTF-8 com acentos | Pendente | Bytes preservam acentos |
 | KFK-10 | Dois eventos com mesma chave de negócio | Pendente | Decidir regra de duplicata |
+
+## Testes do Compose adicionados (v1.1)
+
+Comando: `python -m unittest discover -s infra-tests -p 'test_compose.py' -v` (requer Docker Compose CLI, mas não executa contêineres).
+
+| ID | Cenário | Esperado |
+| --- | --- | --- |
+| KFK-C01 | Configuração contém os 4 serviços | Lista completa |
+| KFK-C02 | Kafka publica apenas porta externa 9094 em loopback | `host_ip=127.0.0.1` |
+| KFK-C03 | Control Center publica apenas 9021 em loopback | `host_ip=127.0.0.1` |
+| KFK-C04 | Anúncios interno/externo são corretos | `kafka:9092` interno; `localhost:9094` externo |
+| KFK-C05 | Gerador de tópicos | `route`, `freight` e `simulation` presentes |
+
+Esses testes **não validam conexão real com Kafka**, TLS, SASL, autenticação nem controles de rede fora da máquina local.
 
 ## Ambientes
 - **Unitário:** Python `unittest`, `ProdutorFalso`, sem Kafka ou rede.

@@ -24,7 +24,11 @@ Experimento Python de publicação e consumo de eventos para os tópicos `route`
 `criar_consumidor()` usa `group_id`, `auto_offset_reset='earliest'` e `enable_auto_commit=False`. Após imprimir cada mensagem, `principal.py` executa `commit()`. O cenário comporta reentrega após interrupção, portanto o consumidor real deve tratar duplicatas antes de produzir efeitos de negócio. Nenhum banco de deduplicação está implementado.
 
 ## Ambiente Docker
-`docker-compose.yaml` define Zookeeper, Confluent Kafka 7.3.0, criador de tópicos e Control Center na porta 9021. `INTERNAL://kafka:9092` serve contêineres; `OUTSIDE://host.docker.internal:9094` atende o host conforme resolução de DNS. Esta configuração é **laboratório sem TLS/SASL e com fator de replicação 1**: não usar como baseline de produção.
+`docker-compose.yaml` define Zookeeper, Confluent Kafka 7.3.0, criador de tópicos e Control Center na porta 9021. `INTERNAL://kafka:9092` serve somente contêineres; `OUTSIDE://localhost:9094` atende o host via porta 127.0.0.1:9094. A porta interna 9092 não é publicada no host e o Control Center (9021) só escuta em 127.0.0.1. Isso remove a dependência de `host.docker.internal:172.17.0.1` e reduz a exposição acidental. Nenhum desses controles substitui TLS/SASL. Esta configuração é **laboratório sem TLS/SASL e com fator de replicação 1**: não usar como baseline de produção.
+
+## Validação específica da rede local (v1.1)
+
+`infra-tests/test_compose.py` executa `docker compose config --format json` e verifica listener interno/externo, host_ip das portas, console local e presença dos três tópicos. O CI também executa essa suíte sem iniciar broker; teste real de conexão continua pendente.
 
 ## Exemplos de CLI
 ```bash
