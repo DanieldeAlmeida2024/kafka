@@ -2,6 +2,7 @@
 import argparse
 import json
 from mensageria.eventos import TOPICOS_PERMITIDOS, criar_evento
+from mensageria.rastreamento import serializar_evento_rastreamento
 from mensageria.servico import PublicadorEventos, criar_produtor, criar_consumidor
 
 def main():
@@ -12,6 +13,9 @@ def main():
     pub.add_argument('--topico', choices=sorted(TOPICOS_PERMITIDOS), required=True)
     pub.add_argument('--tipo', required=True)
     pub.add_argument('--dados', required=True)
+    rast = sub.add_parser('publicar-rastreamento', help='Enviar evento nativo RouteCreated/DeliveryStarted ao Go Simulator')
+    rast.add_argument('--evento', choices=('RouteCreated', 'DeliveryStarted'), required=True)
+    rast.add_argument('--dados', required=True, help='JSON com id/distance/directions ou route_id')
     cons = sub.add_parser('consumir')
     cons.add_argument('--topico', choices=sorted(TOPICOS_PERMITIDOS), required=True)
     cons.add_argument('--grupo', default='laboratorio-python')
@@ -27,6 +31,18 @@ def main():
         finally:
             produtor.close()
         print(f'Evento publicado: {evento.id}')
+    elif args.comando == 'publicar-rastreamento':
+        try:
+            bruto = serializar_evento_rastreamento(args.evento, json.loads(args.dados))
+        except ValueError as erro:
+            parser.error(str(erro))
+        produtor = criar_produtor(args.servidor)
+        try:
+            # Aguardar ack de Kafka antes de declarar que a publicação ocorreu.
+            produtor.send('route', value=bruto).get(timeout=10)
+        finally:
+            produtor.close()
+        print(f'Evento de rastreamento publicado: {args.evento}')
     else:
         consumidor = criar_consumidor(args.servidor, args.topico, args.grupo)
         try:
