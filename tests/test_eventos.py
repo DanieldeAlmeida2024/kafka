@@ -28,3 +28,22 @@ class TestesMensageria(unittest.TestCase):
         self.assertEqual('resultado-simulado', retorno)
         self.assertEqual('simulation', simulado.mensagens[0][0])
         self.assertEqual(1, simulado.flushes)
+
+    def test_nao_permite_dados_que_nao_sao_json(self):
+        from datetime import datetime
+        with self.assertRaises(ValueError):
+            criar_evento('route', 'ROTA_CRIADA', {'data': datetime.now()})
+
+    def test_rejeita_valores_nan_e_infinito(self):
+        for numero in [float('nan'), float('inf'), -float('inf')]:
+            with self.subTest(numero=str(numero)):
+                with self.assertRaises(ValueError):
+                    criar_evento('simulation', 'MOVIMENTO', {'lat': numero})
+
+    def test_limite_bytes_em_evento(self):
+        with self.assertRaises(ValueError):
+            criar_evento('route', 'CRIADA', {'conteudo': 'x' * (257 * 1024)})
+
+    def test_unicode_e_serializacao_utf8(self):
+        evento = criar_evento('freight', 'ENTREGA', {'cidade': 'Goiânia'})
+        self.assertEqual('Goiânia', json.loads(evento.serializar())['dados']['cidade'])
