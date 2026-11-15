@@ -38,6 +38,7 @@ services:
       kafka-topics --create --topic route --if-not-exists --bootstrap-server kafka:9092 &&
       kafka-topics --create --topic freight --if-not-exists --bootstrap-server kafka:9092 &&
       kafka-topics --create --topic simulation --if-not-exists --bootstrap-server kafka:9092 &&
+      kafka-topics --create --topic route-dlq --if-not-exists --bootstrap-server kafka:9092 &&
       kafka-topics --create --topic laboratorio --if-not-exists --bootstrap-server kafka:9092"
 
   control-center:
