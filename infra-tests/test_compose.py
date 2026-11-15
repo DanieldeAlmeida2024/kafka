@@ -41,7 +41,7 @@ class KafkaComposeTest(unittest.TestCase):
     def test_gerador_tem_topicos_necessarios(self):
         cmd = self.services["kafka-topic-generator"]["command"]
         text = " ".join(cmd) if isinstance(cmd, list) else cmd
-        for topico in ("route", "freight", "simulation", "laboratorio"):
+        for topico in ("route", "freight", "simulation", "laboratorio", "route-dlq"):
             self.assertIn("--topic " + topico, text)
 
 

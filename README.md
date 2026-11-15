@@ -63,3 +63,7 @@ python principal.py --servidor localhost:9094 publicar-rastreamento --evento Del
 O comando publica somente no tópico `route`, preservando os campos e a ordem esperados pelo Go. Valida IDs, distância, latitude/longitude, até **600 pontos** e orçamento de até **256 KiB**. Não conecta ao broker quando os dados são inválidos e só relata envio após receber confirmação do produtor Kafka.
 
 A CLI genérica agora usa apenas `laboratorio`: tentar publicar em `route`, `freight` ou `simulation` com envelope didático é recusado **antes de abrir conexão Kafka**. Para `route` use `publicar-rastreamento`; o consumidor genérico permanece capaz de observar os quatro tópicos. Isso evita introduzir por engano mensagens incompatíveis no fluxo Go. O ambiente é didático, sem TLS/SASL e sem garantia de E2E.
+
+## Fila de mensagens incompatíveis (DLQ) — 14/11/2026
+
+O tópico `route-dlq` foi adicionado ao gerador do Compose. O consumidor Go poderá encaminhar eventos inválidos **permanentes** a esse tópico e confirmar a origem somente após a escrita da DLQ concluir. A CLI didática continua restrita a `laboratorio`; publicar diretamente na DLQ não é fluxo de exercícios. A DLQ retém o payload bruto para diagnóstico e deve ser protegida com ACL, retenção limitada e acesso restrito antes de ambiente real. O CI apenas valida a declaração no Compose; não executa broker nem política de retenção.
